@@ -2,3 +2,4 @@
 *.bak
 ClassRegistration/build
 ClassRegistration/dist
+ClassRegistration/nbproject/genfiles.properties
