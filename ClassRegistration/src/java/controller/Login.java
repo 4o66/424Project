@@ -37,7 +37,7 @@ public class Login extends HttpServlet {
         
         /*String aID = "11";*/
         Integer aID = 11;
-        Person person = PersonDB.dbGetPerson(aID); 
+        Person person = new Person(aID); 
         
         String aRole = person.getRole();
         
