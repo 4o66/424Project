@@ -17,22 +17,29 @@ public class Person implements Serializable{
     private int id;
     private String firstName;
     private String lastName;
+    private String role;
+    private String digest;
+    
     private List<Course> courses;
-
-    public Person() {
+    
+    public Person () {
         this.id = 0;
         this.firstName = null;
         this.lastName = null;
         this.courses = null;
+        this.digest = null;
+            
     }
 
-    public Person(int id, String firstName, String lastName, List<Course> courses) {
+     public Person(int id, String firstName, String lastName, String role, String digest, List<Course> courses) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.role = role;
+        this.digest = digest;
         this.courses = courses;
     }
-
+    
     public int getId() {
         return id;
     }
@@ -57,6 +64,22 @@ public class Person implements Serializable{
         this.lastName = lastName;
     }
 
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getDigest() {
+        return digest;
+    }
+
+    public void setDigest(String digest) {
+        this.digest = digest;
+    }
+
     public List<Course> getCourses() {
         return courses;
     }
@@ -64,20 +87,9 @@ public class Person implements Serializable{
     public void setCourses(List<Course> courses) {
         this.courses = courses;
     }
-    
-    public Person validateLogin(int id, String password) {
-        
-        //TODO implement logon password/hash check
-        
-        return null;
-    }
-    
-    public String enroll(Course course, Boolean action) {
-        
-        //TODO implement
-        
-        return null;
-    }
-    
+
+   
+
+ 
     
 }

@@ -12,7 +12,8 @@
         <title>Enrollment System</title>
     </head>
     <body>
-        <form>
+ 
+  <form action="logon" method="post">    
   <div class="container body-content">
             
 
@@ -33,11 +34,19 @@
     <div> </div>
     <p></p>
        <label> Password:</label> <br>
-            <input name="password" value="" type="text" required>
+            <input name="password" value="" type="password" required>
 
 
-            <br /> <br />
-            <footer>
+     <br /> 
+    <div id="buttons">
+            <label>&nbsp;</label>
+            <input value="Submit Login
+                   " type="submit">
+            <br>
+     </div>  
+            
+     <br />
+     <footer>
                 
      <!-- Error message area Start  -->           
                   <%

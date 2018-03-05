@@ -11,6 +11,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import models.*;
+
 
 /**
  *
@@ -29,6 +31,16 @@ public class Login extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+         String loginID = request.getParameter("logon_ID");
+         String password = request.getParameter("password");
+        
+        /*String aID = "11";*/
+        Integer aID = 11;
+        Person person = PersonDB.dbGetPerson(aID); 
+        
+        String aRole = person.getRole();
+        
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
