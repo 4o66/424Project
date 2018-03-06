@@ -8,13 +8,21 @@
         <servlet-name>Enroll</servlet-name>
         <servlet-class>controller.Enroll</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Admin</servlet-name>
+        <servlet-class>controller.Manage</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Logon</servlet-name>
         <url-pattern>/logon</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>Enroll</servlet-name>
-        <url-pattern>/enroll</url-pattern>
+        <url-pattern>/ClassRegistration/enroll</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Admin</servlet-name>
+        <url-pattern>/ClassRegistration/admin</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
@@ -50,8 +58,8 @@
         <auth-method>FORM</auth-method>
         <realm-name>jdbcRealm</realm-name>
         <form-login-config>
-            <form-login-page>/index.jsp</form-login-page>
-            <form-error-page>/index.jsp</form-error-page>
+            <form-login-page>/logon.jsp</form-login-page>
+            <form-error-page>/logon.jsp</form-error-page>
         </form-login-config>
     </login-config>
     <security-role>
