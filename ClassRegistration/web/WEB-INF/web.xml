@@ -4,13 +4,66 @@
         <servlet-name>Logon</servlet-name>
         <servlet-class>controller.Login</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Enroll</servlet-name>
+        <servlet-class>controller.Enroll</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Logon</servlet-name>
         <url-pattern>/logon</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Enroll</servlet-name>
+        <url-pattern>/enroll</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
             30
         </session-timeout>
     </session-config>
+    <security-constraint>
+        <display-name>Enrollment</display-name>
+        <web-resource-collection>
+            <web-resource-name>EnrollmentPages</web-resource-name>
+            <description/>
+            <url-pattern>/enroll/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <description/>
+            <role-name>S</role-name>
+            <role-name>P</role-name>
+        </auth-constraint>
+    </security-constraint>
+    <security-constraint>
+        <display-name>Administration</display-name>
+        <web-resource-collection>
+            <web-resource-name>Admin</web-resource-name>
+            <description/>
+            <url-pattern>/manage/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <description/>
+            <role-name>A</role-name>
+        </auth-constraint>
+    </security-constraint>
+    <login-config>
+        <auth-method>FORM</auth-method>
+        <realm-name>jdbcRealm</realm-name>
+        <form-login-config>
+            <form-login-page>/index.jsp</form-login-page>
+            <form-error-page>/index.jsp</form-error-page>
+        </form-login-config>
+    </login-config>
+    <security-role>
+        <description>Student</description>
+        <role-name>S</role-name>
+    </security-role>
+    <security-role>
+        <description>Professor</description>
+        <role-name>P</role-name>
+    </security-role>
+    <security-role>
+        <description>Administrator</description>
+        <role-name>A</role-name>
+    </security-role>
 </web-app>

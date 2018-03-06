@@ -13,7 +13,7 @@
     </head>
     <body>
  
-  <form action="logon" method="post">    
+  <form action="j_security_check" method="post">    
   <div class="container body-content">
             
 
@@ -30,11 +30,11 @@
     </div>
       
       <div>  </div>  <label> LoginID:</label> <br>
-            <input name="logon_ID" value="" type="text" required>
+            <input name="j_username" value="" type="text" required>
     <div> </div>
     <p></p>
        <label> Password:</label> <br>
-            <input name="password" value="" type="password" required>
+            <input name="j_password" value="" type="password" required>
 
 
      <br /> 

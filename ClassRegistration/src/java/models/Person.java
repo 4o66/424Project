@@ -54,7 +54,7 @@ public class Person implements Serializable {
             Connection connection = DriverManager.getConnection(
                     dbURL, username, password);
             Statement statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery("Select * from person Where id = '" + id + "'");
+            ResultSet rs = statement.executeQuery("Select * from person p join role r on p.id = r.personid Where id = " + id);
 
             if (rs.next()) {
 
@@ -68,7 +68,7 @@ public class Person implements Serializable {
             statement.close();
 
             statement = connection.createStatement();
-            rs = statement.executeQuery("Select * from course c join personcourse p on c.id = p.courseid Where p.personid = '" + id + "'");
+            rs = statement.executeQuery("Select * from course c join personcourse p on c.id = p.courseid Where p.personid = " + id);
             
             if (rs.next()) {
 
