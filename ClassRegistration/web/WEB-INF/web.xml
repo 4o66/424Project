@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
     <servlet>
-        <servlet-name>Logon</servlet-name>
-        <servlet-class>controller.Login</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>Enroll</servlet-name>
         <servlet-class>controller.Enroll</servlet-class>
     </servlet>
@@ -13,16 +9,12 @@
         <servlet-class>controller.Manage</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>Logon</servlet-name>
-        <url-pattern>/logon</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>Enroll</servlet-name>
-        <url-pattern>/ClassRegistration/enroll</url-pattern>
+        <url-pattern>/enroll</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>Admin</servlet-name>
-        <url-pattern>/ClassRegistration/admin</url-pattern>
+        <url-pattern>/admin</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
@@ -47,7 +39,7 @@
         <web-resource-collection>
             <web-resource-name>Admin</web-resource-name>
             <description/>
-            <url-pattern>/manage/*</url-pattern>
+            <url-pattern>/admin/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <description/>

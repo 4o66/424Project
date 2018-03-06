@@ -13,30 +13,30 @@ import java.io.Serializable;
  */
 public class Course implements Serializable{
     
-    private int id;
+    private String id;
     private String name;
     private String description;
     private float hours;
 
     public Course() {
-        this.id = 0;
+        this.id = null;
         this.name = null;
         this.description = null;
         this.hours = 0;
     }
 
-    public Course(int id, String name, String description, float hours) {
+    public Course(String id, String name, String description, float hours) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.hours = hours;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

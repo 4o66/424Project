@@ -11,6 +11,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,7 +24,6 @@ public class Person implements Serializable {
     private String firstName;
     private String lastName;
     private String role;
-    private String digest;
     private List<Course> courses;
 
     public Person() {
@@ -31,22 +31,21 @@ public class Person implements Serializable {
         this.firstName = null;
         this.lastName = null;
         this.courses = null;
-        this.digest = null;
         this.role = null;
 
     }
 
-    public Person(int id, String firstName, String lastName, String role, String digest, List<Course> courses) {
+    public Person(int id, String firstName, String lastName, String role, List<Course> courses) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.role = role;
-        this.digest = digest;
         this.courses = courses;
     }
 
     public Person(int id) {
         try {
+            Class.forName("com.mysql.jdbc.Driver");
             String dbURL = "jdbc:mysql://localhost:3306/classregistration";
             /* String dbURL = "jdbc:mysql://localhost:3306/murach"; */
             String username = "root";
@@ -54,13 +53,12 @@ public class Person implements Serializable {
             Connection connection = DriverManager.getConnection(
                     dbURL, username, password);
             Statement statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery("Select * from person p join role r on p.id = r.personid Where id = " + id);
+            ResultSet rs = statement.executeQuery("Select p.id, p.firstname, p.lastname, r.role from person p join role r on p.id = r.id Where p.id = " + id);
 
             if (rs.next()) {
 
                 this.firstName = rs.getString("firstName");
                 this.lastName = rs.getString("lastName");
-                this.digest = rs.getString("digest");
                 this.id = (id);
                 this.role = rs.getString("role");
 
@@ -68,16 +66,15 @@ public class Person implements Serializable {
             statement.close();
 
             statement = connection.createStatement();
-            rs = statement.executeQuery("Select * from course c join personcourse p on c.id = p.courseid Where p.personid = " + id);
+            rs = statement.executeQuery("Select c.id, c.name, c.description, c.hours from course c join personcourse p on c.id = p.courseid Where p.personid = " + id);
+            
+            this.courses = new ArrayList<Course>();
             
             if (rs.next()) {
 
-                Course newCourse = new Course(
-                    rs.getInt("id"), rs.getString("name"), rs.getString("description"), rs.getFloat("hours")
-                );
-                
-                this.courses.add(newCourse);
-
+                this.courses.add(new Course(
+                    rs.getString("id"), rs.getString("name"), rs.getString("description"), rs.getFloat("hours")
+                ));
             }
             
             statement.close();
@@ -87,6 +84,8 @@ public class Person implements Serializable {
             for (Throwable t : e) {
                 t.printStackTrace();
             }
+        } catch (ClassNotFoundException e) {
+            
         }
     }
 
@@ -120,14 +119,6 @@ public class Person implements Serializable {
 
     public void setRole(String role) {
         this.role = role;
-    }
-
-    public String getDigest() {
-        return digest;
-    }
-
-    public void setDigest(String digest) {
-        this.digest = digest;
     }
 
     public List<Course> getCourses() {
