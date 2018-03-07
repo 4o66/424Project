@@ -6,6 +6,12 @@
 package models;
 
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 
 /**
  *
@@ -30,6 +36,38 @@ public class Course implements Serializable{
         this.name = name;
         this.description = description;
         this.hours = hours;
+    }
+    
+    public Course(String id) {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            String dbURL = "jdbc:mysql://localhost:3306/classregistration";
+            /* String dbURL = "jdbc:mysql://localhost:3306/murach"; */
+            String username = "root";
+            String password = "sesame";
+            Connection connection = DriverManager.getConnection(
+                    dbURL, username, password);
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery("SELECT * FROM course WHERE id LIKE '" + id + "';");
+
+            if (rs.next()) {
+
+                this.name = rs.getString("name");
+                this.description = rs.getString("description");
+                this.id = (id);
+                this.hours = rs.getFloat("hours");
+
+            }
+            statement.close();
+            connection.close();
+
+        } catch (SQLException e) {
+            for (Throwable t : e) {
+                t.printStackTrace();
+            }
+        } catch (ClassNotFoundException e) {
+            
+        }
     }
 
     public String getId() {

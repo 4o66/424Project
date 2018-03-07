@@ -43,13 +43,19 @@ public class Enroll extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        Person person = new Person(Integer.parseInt(request.getUserPrincipal().getName()));
+        
             String action = request.getParameter("action");
             if (action == null) {action = "none";}
         
             if (action.equals("drop")) {
-                
+                if(request.getParameter("course") != null) {
+                    person.dropCourse(request.getParameter("course"));
+                }
             } else if (action.equals("add")){
-                
+                if(request.getParameter("course") != null) {
+                    person.addCourse(request.getParameter("course"));
+                }
             } else if (action.equals("logoff")){ //logout
                 request.getSession().invalidate();
                 
@@ -58,7 +64,7 @@ public class Enroll extends HttpServlet {
                 return;
             }
                    
-        Person person = new Person(Integer.parseInt(request.getUserPrincipal().getName()));
+        //person = new Person(Integer.parseInt(request.getUserPrincipal().getName()));
 
         request.setAttribute("person", person);
 
@@ -101,7 +107,7 @@ public class Enroll extends HttpServlet {
                       
             ResultSet rs = statement.executeQuery();
 
-            if (rs.next()) {
+            while (rs.next()) {
 
                 courses.add(new Course(rs.getString("id"), rs.getString("name"), rs.getString("description"), rs.getFloat("hours")));
 

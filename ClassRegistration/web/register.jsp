@@ -17,6 +17,7 @@
         <p>Pick a class to drop:</p>
         <form action="enroll" method="post">
             <input type="hidden" name="action" value="drop">
+            <input type="hidden" name="id" value="${person.id}">
             <c:forEach items="${person.courses}" var="course">
                 <input type="radio" name="course" value="${course.id}">${course.id}: ${course.name}<br>
             </c:forEach>
@@ -26,10 +27,10 @@
         <p>Pick a class to add:</p>
         <form action="enroll" method="post">
             <input type="hidden" name="action" value="add">
+            <input type="hidden" name="id" value="${person.id}">
             <c:forEach items="${courses}" var="course">
                 <input type="radio" name="course" value="${course.id}">${course.id}: ${course.name}<br>
             </c:forEach>
-
             <label>&nbsp;</label>
             <input type="submit" value="Submit">
         </form>
