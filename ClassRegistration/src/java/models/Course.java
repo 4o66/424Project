@@ -8,6 +8,7 @@ package models;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -17,8 +18,8 @@ import java.util.ArrayList;
  *
  * @author Sean Cox
  */
-public class Course implements Serializable{
-    
+public class Course implements Serializable {
+
     private String id;
     private String name;
     private String description;
@@ -37,7 +38,7 @@ public class Course implements Serializable{
         this.description = description;
         this.hours = hours;
     }
-    
+
     public Course(String id) {
         try {
             Class.forName("com.mysql.jdbc.Driver");
@@ -66,7 +67,7 @@ public class Course implements Serializable{
                 t.printStackTrace();
             }
         } catch (ClassNotFoundException e) {
-            
+
         }
     }
 
@@ -101,5 +102,57 @@ public class Course implements Serializable{
     public void setHours(float hours) {
         this.hours = hours;
     }
-        
+
+    public Boolean delCourse(String id) {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            String dbURL = "jdbc:mysql://localhost:3306/classregistration";
+            /* String dbURL = "jdbc:mysql://localhost:3306/murach"; */
+            String username = "root";
+            String password = "sesame";
+            Connection connection = DriverManager.getConnection(
+                    dbURL, username, password);
+            Statement statement = connection.createStatement();
+            statement.executeUpdate("DELETE FROM course WHERE id LIKE '" + id + "';");
+            statement.close();
+            connection.close();
+
+        } catch (SQLException e) {
+            for (Throwable t : e) {
+                t.printStackTrace();
+            }
+            return false;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public void addCourse() {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            String dbURL = "jdbc:mysql://localhost:3306/classregistration";
+            /* String dbURL = "jdbc:mysql://localhost:3306/murach"; */
+            String username = "root";
+            String password = "sesame";
+            Connection connection = DriverManager.getConnection(
+                    dbURL, username, password);
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO course (id, name, description, hours) VALUES (?, ?, ?, ?);");
+            statement.setString(1, this.id);
+            statement.setString(2, this.name);
+            statement.setString(3, this.description);
+            statement.setFloat(4, this.hours);
+            statement.executeUpdate();
+            statement.close();
+            connection.close();
+
+        } catch (SQLException e) {
+            for (Throwable t : e) {
+                t.printStackTrace();
+            }
+        } catch (ClassNotFoundException e) {
+
+        }
+    }
 }

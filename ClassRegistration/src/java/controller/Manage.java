@@ -12,6 +12,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -25,8 +27,8 @@ import models.Person;
  *
  * @author Sean Cox
  */
-@WebServlet(name = "Enroll", urlPatterns = {"/enroll"})
-public class Enroll extends HttpServlet {
+@WebServlet(name = "Manage", urlPatterns = {"/manage"})
+public class Manage extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -41,18 +43,43 @@ public class Enroll extends HttpServlet {
             throws ServletException, IOException {
 
         Person person = new Person(Integer.parseInt(request.getUserPrincipal().getName()));
+        request.setAttribute("person", person);
 
         String action = request.getParameter("action");
         if (action != null) {
             switch (action) {
-                case "drop":
-                    if (request.getParameter("course") != null) {
-                        person.dropCourse(request.getParameter("course"));
-                    }   break;
-                case "add":
-                    if (request.getParameter("course") != null) {
-                        person.addCourse(request.getParameter("course"));
-                    }   break;
+                case "addcourse":
+
+                    String id = "",
+                     name = "",
+                     description = "";
+                    int hours;
+
+                    try {
+                        id = request.getParameter("courseid");
+                        name = request.getParameter("coursename");
+                        description = request.getParameter("coursedescription");
+                        hours = Integer.parseInt(request.getParameter("coursehours"));
+                    } catch (NumberFormatException e) {
+                        request.setAttribute("message", "Course hours must be a number.");
+                        request.setAttribute("courseid", id);
+                        request.setAttribute("coursename", name);
+                        request.setAttribute("coursedescription", description);
+                        String url = "/admin.jsp";
+                        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(url);
+                        dispatcher.forward(request, response);
+                        return;
+                    }
+
+                    Course course = new Course(id, name, description, hours);
+                    course.addCourse();
+
+                    break;
+                case "deletecourse":
+                    if (!new Course().delCourse(request.getParameter("course"))) {
+                        request.setAttribute("message", "Unable to delete course " + request.getParameter("course"));
+                    }
+                    break;
                 case "logoff":
                     //logout
                     request.getSession().invalidate();
@@ -63,9 +90,6 @@ public class Enroll extends HttpServlet {
                     break;
             }
         }
-
-        //person = new Person(Integer.parseInt(request.getUserPrincipal().getName()));
-        request.setAttribute("person", person);
 
         ArrayList<Course> courses = new ArrayList<>();
 
@@ -81,27 +105,11 @@ public class Enroll extends HttpServlet {
             String query = null;
             PreparedStatement statement;
 
-            if (person.getRole().equals("S")) { //Only get classes with professors that they are not enrolled in
-                statement = connection.prepareStatement("select distinct c.id, c.name, c.description, c.hours "
-                        + "from course c "
-                        + "left join personcourse pc on c.id = pc.courseid "
-                        + "join person p on pc.personid = p.id "
-                        + "join role r on p.id = r.id and r.role like 'P' "
-                        + "where c.id not in ("
-                        + "	select distinct courseid from personcourse where personid = ?"
-                        + ");");
-                statement.setInt(1, person.getId());
-            } else {  //Get all classes with no professor
-                statement = connection.prepareStatement("select c.id, c.name, c.description, c.hours "
-                        + "from course c "
-                        + "where c.id not in ( "
-                        + "	select c.id "
-                        + "	from course c "
-                        + "	left join personcourse pc on c.id = pc.courseid "
-                        + "	join person p on pc.personid = p.id "
-                        + "   join role r on p.id = r.id and r.role like 'P' "
-                        + ");");
-            }
+            statement = connection.prepareStatement("select * "
+                    + "from course c "
+                    + "where c.id not in ( "
+                    + "	select distinct courseid "
+                    + "	from personcourse);");
 
             ResultSet rs = statement.executeQuery();
 
@@ -122,10 +130,9 @@ public class Enroll extends HttpServlet {
         }
 
         request.setAttribute("courses", courses);
-        String url = "/register.jsp";
+        String url = "/admin.jsp";
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(url);
         dispatcher.forward(request, response);
-
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
