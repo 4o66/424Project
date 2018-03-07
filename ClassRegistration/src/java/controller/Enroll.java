@@ -7,12 +7,21 @@ package controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import models.Course;
 import models.Person;
 
 /**
@@ -34,29 +43,88 @@ public class Enroll extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        Person person = new Person();
+            String action = request.getParameter("action");
+            if (action == null) {action = "none";}
+        
+            if (action.equals("drop")) {
+                
+            } else if (action.equals("add")){
+                
+            } else if (action.equals("logoff")){ //logout
+                request.getSession().invalidate();
+                
+                String url = "/ClassRegistration";
+                response.sendRedirect(url);
+                return;
+            }
+                   
+        Person person = new Person(Integer.parseInt(request.getUserPrincipal().getName()));
 
-        if (request.getAttribute("person") == null) {
-            request.setAttribute("person", new Person(Integer.parseInt(request.getUserPrincipal().getName())));
+        request.setAttribute("person", person);
+
+        ArrayList<Course> courses = new ArrayList<>();
+        
+            try {
+            Class.forName("com.mysql.jdbc.Driver");
+            String dbURL = "jdbc:mysql://localhost:3306/classregistration";
+            /* String dbURL = "jdbc:mysql://localhost:3306/murach"; */
+            String username = "root";
+            String password = "sesame";
+            Connection connection = DriverManager.getConnection(
+                    dbURL, username, password);
+            
+            
+            String query = null;
+            PreparedStatement statement = null;
+            
+            if (person.getRole().equals("S")) { //Only get classes with professors that they are not enrolled in
+                statement = connection.prepareStatement("select distinct c.id, c.name, c.description, c.hours " +
+                    "from course c " +
+                    "left join personcourse pc on c.id = pc.courseid " +
+                    "join person p on pc.personid = p.id " +
+                    "join role r on p.id = r.id and r.role like 'P' " +
+                    "where c.id not in (" +
+                    "	select distinct courseid from personcourse where personid = ?" +
+                    ");");
+                statement.setInt(1, person.getId());
+            } else {  //Get all classes with no professor
+                statement = connection.prepareStatement("select c.id, c.name, c.description, c.hours " +
+                    "from course c " +
+                    "where c.id not in ( " +
+                    "	select c.id " +
+                    "	from course c " +
+                    "	left join personcourse pc on c.id = pc.courseid " +
+                    "	join person p on pc.personid = p.id " +
+                    "   join role r on p.id = r.id and r.role like 'P' " +
+                    ");");
+            }
+                      
+            ResultSet rs = statement.executeQuery();
+
+            if (rs.next()) {
+
+                courses.add(new Course(rs.getString("id"), rs.getString("name"), rs.getString("description"), rs.getFloat("hours")));
+
+            }
+            statement.close();
+            connection.close();
+
+        } catch (SQLException e) {
+            for (Throwable t : e) {
+                t.printStackTrace();
+            }
+        } catch (ClassNotFoundException e) {
+            
         }
-        person = (Person) request.getAttribute("person");
+            
+        request.setAttribute("courses", courses);
+        String url = "/register.jsp";
+        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(url);
+        dispatcher.forward(request, response);
+        
 
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet Enroll</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet Enroll at " + request.getContextPath() + "</h1>");
-            out.println(person.getFirstName() + " " + person.getLastName());
-
-            out.println("</body>");
-            out.println("</html>");
         }
-    }
+    
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
