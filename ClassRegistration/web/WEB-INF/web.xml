@@ -4,17 +4,9 @@
         <servlet-name>Enroll</servlet-name>
         <servlet-class>controller.Enroll</servlet-class>
     </servlet>
-    <servlet>
-        <servlet-name>Admin</servlet-name>
-        <servlet-class>controller.Manage</servlet-class>
-    </servlet>
     <servlet-mapping>
         <servlet-name>Enroll</servlet-name>
         <url-pattern>/enroll</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>Admin</servlet-name>
-        <url-pattern>/admin</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
