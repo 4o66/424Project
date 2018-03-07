@@ -6,12 +6,22 @@
 package controller;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import models.Course;
+import models.Person;
 
 /**
  *
@@ -32,16 +42,43 @@ public class Manage extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        Person person = new Person(Integer.parseInt(request.getUserPrincipal().getName()));
+        request.setAttribute("person", person);
+
         String action = request.getParameter("action");
         if (action != null) {
             switch (action) {
                 case "addcourse":
+
+                    String id = "",
+                     name = "",
+                     description = "";
+                    int hours;
+
+                    try {
+                        id = request.getParameter("courseid");
+                        name = request.getParameter("coursename");
+                        description = request.getParameter("coursedescription");
+                        hours = Integer.parseInt(request.getParameter("coursehours"));
+                    } catch (NumberFormatException e) {
+                        request.setAttribute("message", "Course hours must be a number.");
+                        request.setAttribute("courseid", id);
+                        request.setAttribute("coursename", name);
+                        request.setAttribute("coursedescription", description);
+                        String url = "/admin.jsp";
+                        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(url);
+                        dispatcher.forward(request, response);
+                        return;
+                    }
+
+                    Course course = new Course(id, name, description, hours);
+                    course.addCourse();
+
                     break;
                 case "deletecourse":
-                    break;
-                case "addperson":
-                    break;
-                case "deleteperson":
+                    if (!new Course().delCourse(request.getParameter("course"))) {
+                        request.setAttribute("message", "Unable to delete course " + request.getParameter("course"));
+                    }
                     break;
                 case "logoff":
                     //logout
@@ -52,8 +89,47 @@ public class Manage extends HttpServlet {
                 default:
                     break;
             }
-        } 
+        }
 
+        ArrayList<Course> courses = new ArrayList<>();
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            String dbURL = "jdbc:mysql://localhost:3306/classregistration";
+            /* String dbURL = "jdbc:mysql://localhost:3306/murach"; */
+            String username = "root";
+            String password = "sesame";
+            Connection connection = DriverManager.getConnection(
+                    dbURL, username, password);
+
+            String query = null;
+            PreparedStatement statement;
+
+            statement = connection.prepareStatement("select * "
+                    + "from course c "
+                    + "where c.id not in ( "
+                    + "	select distinct courseid "
+                    + "	from personcourse);");
+
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+
+                courses.add(new Course(rs.getString("id"), rs.getString("name"), rs.getString("description"), rs.getFloat("hours")));
+
+            }
+            statement.close();
+            connection.close();
+
+        } catch (SQLException e) {
+            for (Throwable t : e) {
+                t.printStackTrace();
+            }
+        } catch (ClassNotFoundException e) {
+
+        }
+
+        request.setAttribute("courses", courses);
         String url = "/admin.jsp";
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(url);
         dispatcher.forward(request, response);

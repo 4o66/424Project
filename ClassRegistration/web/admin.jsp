@@ -14,17 +14,23 @@
     </head>
     <body>
         <h1>Hello ${person.firstName} ${person.lastName}</h1>
-        <p>Pick a class to drop:</p>
+        <p style="color: red;">${message}</p>
+        <p>Pick a class to remove (must have no students or professors registered):</p>
         <form action="manage" method="post">
-            <input type="hidden" name="action" value="drop">
-            
+            <input type="hidden" name="action" value="deletecourse">
+            <c:forEach items="${courses}" var="course">
+                <input type="radio" name="course" value="${course.id}">${course.id}: ${course.name}<br>
+            </c:forEach>
             <label>&nbsp;</label>
             <input type="submit" value="Submit">
         </form>
-        <p>Pick a class to add:</p>
+        <p>Pick a class to create:</p>
         <form action="manage" method="post">
-            <input type="hidden" name="action" value="add">
-            
+            <input type="hidden" name="action" value="addcourse">
+            Course ID: <input type="text" size="10" required="true" name="courseid" value="${courseid}"/><br/>
+            Course Name: <input type="text" size="60" required="true" name="coursename" value="${coursename}"/><br/>
+            Course Description: <textarea name="coursedescription" required="true">${coursedescription}</textarea><br/>
+            Course Hours: <input type="text" size="4" inputmode="numeric" required="true" name="coursehours" value="${coursehours}"/><br/>
             <label>&nbsp;</label>
             <input type="submit" value="Submit">
         </form>
