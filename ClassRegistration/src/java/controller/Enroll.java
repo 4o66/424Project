@@ -6,15 +6,12 @@
 package controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -44,33 +41,35 @@ public class Enroll extends HttpServlet {
             throws ServletException, IOException {
 
         Person person = new Person(Integer.parseInt(request.getUserPrincipal().getName()));
-        
-            String action = request.getParameter("action");
-            if (action == null) {action = "none";}
-        
-            if (action.equals("drop")) {
-                if(request.getParameter("course") != null) {
-                    person.dropCourse(request.getParameter("course"));
-                }
-            } else if (action.equals("add")){
-                if(request.getParameter("course") != null) {
-                    person.addCourse(request.getParameter("course"));
-                }
-            } else if (action.equals("logoff")){ //logout
-                request.getSession().invalidate();
-                
-                String url = "/ClassRegistration";
-                response.sendRedirect(url);
-                return;
-            }
-                   
-        //person = new Person(Integer.parseInt(request.getUserPrincipal().getName()));
 
+        String action = request.getParameter("action");
+        if (action != null) {
+            switch (action) {
+                case "drop":
+                    if (request.getParameter("course") != null) {
+                        person.dropCourse(request.getParameter("course"));
+                    }   break;
+                case "add":
+                    if (request.getParameter("course") != null) {
+                        person.addCourse(request.getParameter("course"));
+                    }   break;
+                case "logoff":
+                    //logout
+                    request.getSession().invalidate();
+                    String url = "/ClassRegistration";
+                    response.sendRedirect(url);
+                    return;
+                default:
+                    break;
+            }
+        }
+
+        //person = new Person(Integer.parseInt(request.getUserPrincipal().getName()));
         request.setAttribute("person", person);
 
         ArrayList<Course> courses = new ArrayList<>();
-        
-            try {
+
+        try {
             Class.forName("com.mysql.jdbc.Driver");
             String dbURL = "jdbc:mysql://localhost:3306/classregistration";
             /* String dbURL = "jdbc:mysql://localhost:3306/murach"; */
@@ -78,33 +77,32 @@ public class Enroll extends HttpServlet {
             String password = "sesame";
             Connection connection = DriverManager.getConnection(
                     dbURL, username, password);
-            
-            
+
             String query = null;
-            PreparedStatement statement = null;
-            
+            PreparedStatement statement;
+
             if (person.getRole().equals("S")) { //Only get classes with professors that they are not enrolled in
-                statement = connection.prepareStatement("select distinct c.id, c.name, c.description, c.hours " +
-                    "from course c " +
-                    "left join personcourse pc on c.id = pc.courseid " +
-                    "join person p on pc.personid = p.id " +
-                    "join role r on p.id = r.id and r.role like 'P' " +
-                    "where c.id not in (" +
-                    "	select distinct courseid from personcourse where personid = ?" +
-                    ");");
+                statement = connection.prepareStatement("select distinct c.id, c.name, c.description, c.hours "
+                        + "from course c "
+                        + "left join personcourse pc on c.id = pc.courseid "
+                        + "join person p on pc.personid = p.id "
+                        + "join role r on p.id = r.id and r.role like 'P' "
+                        + "where c.id not in ("
+                        + "	select distinct courseid from personcourse where personid = ?"
+                        + ");");
                 statement.setInt(1, person.getId());
             } else {  //Get all classes with no professor
-                statement = connection.prepareStatement("select c.id, c.name, c.description, c.hours " +
-                    "from course c " +
-                    "where c.id not in ( " +
-                    "	select c.id " +
-                    "	from course c " +
-                    "	left join personcourse pc on c.id = pc.courseid " +
-                    "	join person p on pc.personid = p.id " +
-                    "   join role r on p.id = r.id and r.role like 'P' " +
-                    ");");
+                statement = connection.prepareStatement("select c.id, c.name, c.description, c.hours "
+                        + "from course c "
+                        + "where c.id not in ( "
+                        + "	select c.id "
+                        + "	from course c "
+                        + "	left join personcourse pc on c.id = pc.courseid "
+                        + "	join person p on pc.personid = p.id "
+                        + "   join role r on p.id = r.id and r.role like 'P' "
+                        + ");");
             }
-                      
+
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
@@ -120,17 +118,15 @@ public class Enroll extends HttpServlet {
                 t.printStackTrace();
             }
         } catch (ClassNotFoundException e) {
-            
+
         }
-            
+
         request.setAttribute("courses", courses);
         String url = "/register.jsp";
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(url);
         dispatcher.forward(request, response);
-        
 
-        }
-    
+    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**

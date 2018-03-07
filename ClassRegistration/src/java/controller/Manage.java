@@ -6,7 +6,7 @@
 package controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -31,19 +31,32 @@ public class Manage extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet Manage</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet Manage at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
+
+        String action = request.getParameter("action");
+        if (action != null) {
+            switch (action) {
+                case "addcourse":
+                    break;
+                case "deletecourse":
+                    break;
+                case "addperson":
+                    break;
+                case "deleteperson":
+                    break;
+                case "logoff":
+                    //logout
+                    request.getSession().invalidate();
+                    String url = "/ClassRegistration";
+                    response.sendRedirect(url);
+                    return;
+                default:
+                    break;
+            }
+        } 
+
+        String url = "/admin.jsp";
+        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(url);
+        dispatcher.forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
