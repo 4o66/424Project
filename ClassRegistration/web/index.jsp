@@ -15,5 +15,6 @@
         <h1>Enroll Admin Link Page</h1>
         <p>Click <a href="enroll" >Here</a> To enroll</p> <br>
        
+        <p>Click <a href="manage" >Here</a> To manage</p> <br>
     </body>
 </html>
